@@ -1,8 +1,8 @@
 import numpy as np
 
-from GraphReadLib import txt_to_ndarray
+from GraphReadLib import get_graph
 
-SCC_filename = "SCC.txt"
+SCC_filename = "SCC"
+G = get_graph(SCC_filename)
 
-G = txt_to_ndarray(SCC_filename)
-print(G)
+print('all done.')

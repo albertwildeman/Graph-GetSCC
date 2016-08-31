@@ -1,25 +1,30 @@
 import os
 import numpy as np
 
-def txt_to_ndarray(filename):
+def get_graph(filename):
 
-    graph = os.getcwd()
-    # dropbox_directory = "C:\\Users\\Albert\\Dropbox\\Algorithms\\Assignments\\"
-    # filepath = dropbox_directory + algoFileName
-    #
-    # n = 200
-    # Nodes = [0] * n
-    # Edges = [0] * n
-    #
-    # file_graph = open(filepath)
-    #
-    # for iLine, line in enumerate(file_graph):
-    #     x, *y = line.split("\t")
-    #     Nodes[iLine] = int(x) - 1
-    #     Edges[iLine] = list(int(i) - 1 for i in y[:-1])
-    #
-    # file_graph.close()
-    #
-    # graph = [Nodes, Edges]
+    npy_version_exists = os.path.isfile(filename + ".npy")
+    if not npy_version_exists:
+        txt_to_npy(filename)
 
-    return graph
+    return np.load(filename + ".npy")
+
+
+def txt_to_npy(filename):
+
+    filepath = os.getcwd() + "\\" + filename + ".txt"
+
+    file_graph = open(filepath)
+
+    nLines = sum(1 for line in file_graph)
+    G = np.zeros((nLines, 2), dtype=np.int32)
+
+    file_graph.seek(0,0)
+    for iLine, line in enumerate(file_graph):
+        G[iLine,0], G[iLine,1] = line.split(" ")[:2]
+
+    file_graph.close()
+
+    np.save(filename, G)
+
+    return "done"
