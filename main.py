@@ -5,7 +5,7 @@ from KosarajuLib import kosaraju
 
 #  Get the graph from file
 # SCC_filename = "SCCsmall"
-SCC_filename = "SCC"
+SCC_filename = "SCCsmall"
 G = get_graph(SCC_filename)
 
 # Perform the Kosaraju algorithm to get the leaders for each node.

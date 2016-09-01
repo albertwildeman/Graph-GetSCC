@@ -38,24 +38,37 @@ def kosaraju_rev_dfs_loop(G):
 
 def DFS_rev(G, s, t, f, explored):
 
-    explored[s] = True
+    stacksize = 1000
+    stack = np.zeros(stacksize, dtype=np.int32)
+    stackexpl = np.zeros(stacksize, dtype=np.bool)
 
-    # for targetNode in G[G[:,0]==s][:,1]:
-    #     if not explored[targetNode]:
-    #         t = DFS_rev(G, targetNode, t, f, explored)
+    stack[0] = s
+    iStack = 0
 
-    for iEdge in range(G.shape[0]):
+    while iStack >= 0:
 
-        if (G[iEdge,0]==s) and (not explored[G[iEdge,1]]):
-            targetNode = G[iEdge, 1]
-            t = DFS_rev(G, targetNode, t, f, explored)
+        iNode = stack[iStack]
+        explored[iNode] = True
 
+        if not stackexpl[iStack]:
+            stackexpl[iStack] = True
 
-    # Set finishing time for node just explored to the current "time" t
-    f[s] = t
-    # Increment t
-    t += 1
-    print("t: " + str(t))
+            for targetNode in G[G[:,0]==iNode][:,1]:
+                if not explored[targetNode]:
+                    iStack += 1
+                    if iStack >=stacksize:
+                        raise NameError("Ran out of stack space")
+                    stack[iStack] = targetNode
+                    stackexpl[iStack] = False
+        else:
+            # stackexpl "true" number in implies need to process finishing time
+            # Set finishing time for node just explored to the current "time" t
+            f[iNode] = t
+            # Increment t
+            t += 1
+
+            iStack -= 1
+
     return t
 
 def kosaraju_fwd_dfs_loop(G, f):
