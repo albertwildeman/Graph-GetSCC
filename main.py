@@ -4,6 +4,7 @@ from GraphReadLib import get_graph
 from KosarajuLib import kosaraju
 
 #  Get the graph from file
+# SCC_filename = "SCCsmall"
 SCC_filename = "SCC"
 G = get_graph(SCC_filename)
 

@@ -40,10 +40,16 @@ def DFS_rev(G, s, t, f, explored):
 
     explored[s] = True
 
-    edges_from_s = G[G[:,0]==s][:,1]
-    for targetNode in edges_from_s:
-        if not explored[targetNode]:
+    # for targetNode in G[G[:,0]==s][:,1]:
+    #     if not explored[targetNode]:
+    #         t = DFS_rev(G, targetNode, t, f, explored)
+
+    for iEdge in range(G.shape[0]):
+
+        if (G[iEdge,0]==s) and (not explored[G[iEdge,1]]):
+            targetNode = G[iEdge, 1]
             t = DFS_rev(G, targetNode, t, f, explored)
+
 
     # Set finishing time for node just explored to the current "time" t
     f[s] = t
