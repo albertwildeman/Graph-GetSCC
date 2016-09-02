@@ -130,7 +130,7 @@ def kosaraju_fwd_dfs_loop(G):
     for iNode in range(nNodes):
         if not explored[iNode]:
             # call DFS
-            if iNode%1000==0:
+            if iNode%10000==0:
                 print("DFS_fwd exploring node " + str(iNode))
 
             DFS_fwd(G, G_idx, iNode, leaders, explored)
@@ -146,7 +146,6 @@ def DFS_fwd(G, G_idx, s, leaders, explored):
     stack[0] = s
     iStack = 0
     explored[s] = True
-    leaders[s] = s
 
     while iStack >= 0:
 
@@ -159,7 +158,6 @@ def DFS_fwd(G, G_idx, s, leaders, explored):
             if not explored[targetNode]:
 
                 explored[targetNode] = True
-                # leaders[targetNode] = s
 
                 iStack += 1
 
