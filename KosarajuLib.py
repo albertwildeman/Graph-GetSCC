@@ -1,4 +1,5 @@
 import numpy as np
+from timeit import default_timer as timer
 
 def kosaraju(G):
 
@@ -6,9 +7,9 @@ def kosaraju(G):
     G -= G.min()
 
     # Calculate finishing time for each node, that is, the order is in which the second, forward, DFS loop will execute
-    f = kosaraju_rev_dfs_loop(G)
+    f = kosaraju_rev_dfs_loop(G[:, ::-1])
 
-    # Reorder the nodes, in order of decreading finishing time
+    # Reorder the nodes, in order of decreasing finishing time
     reordering = f.max() - f
     G_reordered = reordering[G]
 
@@ -19,6 +20,13 @@ def kosaraju(G):
 
 def kosaraju_rev_dfs_loop(G):
     # Perform the first DFS (depth-first search) loop on the reverse of graph G
+
+    # Buid an array holding the part of the edge list that is relevant for each node
+    # To facilitate, first sort the edge list by sending node
+    sortOrder = np.argsort(G[:, 0])
+    G = G[sortOrder, :]
+    # Get start and end indices within G for edges going out from each node
+    G_idx = edge_offsets(G)
 
     # t is a counter that marks number of already-explored nodes.
     # It will be used to determine the processing order of the nodes for the
@@ -37,14 +45,34 @@ def kosaraju_rev_dfs_loop(G):
     for iNode in range(nNodes):
         if not explored[iNode]:
             # call DFS, but with the rows (ie, direction) of the edge list reversed
-            print("DFS_rev exploring node " + str(iNode))
-            t = DFS_rev(G[:, ::-1], iNode, t, f, explored)
+            if iNode < 10:
+                print("DFS_rev exploring node " + str(iNode))
+            t = DFS_rev(G, G_idx, iNode, t, f, explored)
 
     return f
 
-def DFS_rev(G, s, t, f, explored):
 
-    stacksize = 100000
+def edge_offsets(G):
+
+    nNodes = G.max() + 1
+    nEdges = G.shape[0]
+
+    G_node = np.zeros((nNodes,2), dtype=np.int32)
+
+    iNode = 0;
+    for iEdge in range(nEdges):
+        if G[iEdge,0] != iNode:
+            G_node[iNode, 1] = iEdge
+            iNode = G[iEdge,0]
+            G_node[iNode,0] = iEdge
+
+    G_node[iNode,1] = nEdges
+
+    return G_node
+
+def DFS_rev(G, G_idx, s, t, f, explored):
+
+    stacksize = 1e7
     stack = np.zeros(stacksize, dtype=np.int32)
     stackexpl = np.zeros(stacksize, dtype=np.bool)
 
@@ -59,10 +87,10 @@ def DFS_rev(G, s, t, f, explored):
         if not stackexpl[iStack]:
             stackexpl[iStack] = True
 
-            for targetNode in G[G[:,0]==iNode][:,1]:
+            for targetNode in G[G_idx[iNode, 0]:G_idx[iNode, 1], 1]:
                 if not explored[targetNode]:
                     iStack += 1
-                    if iStack >=stacksize:
+                    if iStack >= stacksize:
                         raise NameError("Ran out of stack space")
                     stack[iStack] = targetNode
                     stackexpl[iStack] = False
@@ -81,6 +109,13 @@ def DFS_rev(G, s, t, f, explored):
 def kosaraju_fwd_dfs_loop(G):
     # Perform the second DFS (depth-first search) loop on the graph G
 
+    # Buid an array holding the part of the edge list that is relevant for each node
+    # To facilitate, first sort the edge list by sending node
+    sortOrder = np.argsort(G[:, 0])
+    G = G[sortOrder, :]
+    # Get start and end indices within G for edges going out from each node
+    G_idx = edge_offsets(G)
+
     # Get number of nodes from edge list G
     nNodes = G.max() + 1
 
@@ -93,14 +128,17 @@ def kosaraju_fwd_dfs_loop(G):
     for iNode in range(nNodes):
         if not explored[iNode]:
             # call DFS
-            DFS_fwd(G, iNode, leaders, explored)
+            if iNode%1000==0:
+                print("DFS_fwd exploring node " + str(iNode))
+
+            DFS_fwd(G, G_idx, iNode, leaders, explored)
 
     return leaders
 
 
-def DFS_fwd(G, s, leaders, explored):
+def DFS_fwd(G, G_idx, s, leaders, explored):
 
-    stacksize = 1000
+    stacksize = 1e7
     stack = np.zeros(stacksize, dtype=np.int32)
 
     stack[0] = s
@@ -114,7 +152,7 @@ def DFS_fwd(G, s, leaders, explored):
 
         iStack -= 1
 
-        for targetNode in G[G[:,0]==iNode][:,1]:
+        for targetNode in G[G_idx[iNode, 0]:G_idx[iNode, 1], 1]:
             if not explored[targetNode]:
                 iStack += 1
 
@@ -122,5 +160,4 @@ def DFS_fwd(G, s, leaders, explored):
                     raise NameError("Ran out of stack space")
 
                 stack[iStack] = targetNode
-
 

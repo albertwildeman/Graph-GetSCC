@@ -5,8 +5,13 @@ from KosarajuLib import kosaraju
 
 #  Get the graph from file
 # SCC_filename = "SCCsmall"
+# SCC_filename = "SCCsmall2"
 SCC_filename = "SCC"
 G = get_graph(SCC_filename)
+
+if SCC_filename != "SCC":
+    sortOrder = np.argsort(G[:,0])
+    G = G[sortOrder,:]
 
 # Perform the Kosaraju algorithm to get the leaders for each node.
 # (the nodes reporting a shared leader will belong to the same SCC).
@@ -18,7 +23,7 @@ for ldr in range(nLeaders):
     SCC_sizes[ldr] = sum(leaders==ldr)
 
 SCC_sizes[::-1].sort()
-print(SCC_sizes[:5])
+print("Size of largest 5 SCCs: " + str(SCC_sizes[:5]))
 
 
 print('all done.')
