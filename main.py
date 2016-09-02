@@ -17,11 +17,7 @@ if SCC_filename != "SCC":
 # (the nodes reporting a shared leader will belong to the same SCC).
 leaders = kosaraju(G)
 nLeaders = leaders.max()+1
-SCC_sizes = np.zeros(nLeaders,dtype=np.int32)
-
-for ldr in range(nLeaders):
-    SCC_sizes[ldr] = sum(leaders==ldr)
-
+SCC_sizes = np.bincount(leaders)
 SCC_sizes[::-1].sort()
 print("Size of largest 5 SCCs: " + str(SCC_sizes[:5]))
 

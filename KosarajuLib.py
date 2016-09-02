@@ -78,17 +78,19 @@ def DFS_rev(G, G_idx, s, t, f, explored):
 
     stack[0] = s
     iStack = 0
+    explored[s] = True
 
     while iStack >= 0:
 
         iNode = stack[iStack]
-        explored[iNode] = True
 
         if not stackexpl[iStack]:
             stackexpl[iStack] = True
 
             for targetNode in G[G_idx[iNode, 0]:G_idx[iNode, 1], 1]:
                 if not explored[targetNode]:
+                    explored[targetNode] = True
+
                     iStack += 1
                     if iStack >= stacksize:
                         raise NameError("Ran out of stack space")
@@ -143,17 +145,22 @@ def DFS_fwd(G, G_idx, s, leaders, explored):
 
     stack[0] = s
     iStack = 0
+    explored[s] = True
+    leaders[s] = s
 
     while iStack >= 0:
 
         iNode = stack[iStack]
-        explored[iNode] = True
         leaders[iNode] = s
 
         iStack -= 1
 
         for targetNode in G[G_idx[iNode, 0]:G_idx[iNode, 1], 1]:
             if not explored[targetNode]:
+
+                explored[targetNode] = True
+                # leaders[targetNode] = s
+
                 iStack += 1
 
                 if iStack >=stacksize:
